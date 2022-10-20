@@ -54,9 +54,11 @@ protected:
     std::string PerfTestFileExtension = ".csv";
     static constexpr size_t PerfTestRepeats = 10;
 
-    FinderPerfTest() {};
+    FinderPerfTest() = default;
+    ;
 
-    ~FinderPerfTest() override {};
+    ~FinderPerfTest() override = default;
+    ;
 
     void SetUp() override {
         std::cout << '\n';
@@ -72,6 +74,11 @@ TEST_F(FinderPerfTest, linear_search) {
     std::ofstream DetailedOutput(PerfTestPath + "Detailed" + this->test_info_->test_suite_name() + this->test_info_->name()
                                          + PerfTestFileExtension,
                                  std::ios::out);
+    DetailedOutput << "Columns,Rows,";
+    Output << "Columns,Rows,Time\n";
+    for (int i = 0; i < abs(ColumnsStartPoint / ColumnsDifference); ++i) {
+        DetailedOutput << "Pass" << i << (i != abs(ColumnsStartPoint / ColumnsDifference) - 1 ? "," : "\n");
+    }
     for (size_t Columns = ColumnsStartPoint; Columns > 0; Columns += ColumnsDifference) {
         DetailedOutput << Columns << "," << RowsStartPoint << ",";
         for (size_t TestIteration = 0; TestIteration < PerfTestRepeats; ++TestIteration) {
@@ -109,6 +116,11 @@ TEST_F(FinderPerfTest, binary_search) {
     std::ofstream DetailedOutput(PerfTestPath + "Detailed" + this->test_info_->test_suite_name() + this->test_info_->name()
                                          + PerfTestFileExtension,
                                  std::ios::out);
+    DetailedOutput << "Columns,Rows,";
+    Output << "Columns,Rows,Time\n";
+    for (int i = 0; i < abs(ColumnsStartPoint / ColumnsDifference); ++i) {
+        DetailedOutput << "Pass" << i << (i != abs(ColumnsStartPoint / ColumnsDifference) - 1 ? "," : "\n");
+    }
     for (size_t Columns = ColumnsStartPoint; Columns > 0; Columns += ColumnsDifference) {
         DetailedOutput << Columns << "," << RowsStartPoint << ",";
         for (size_t TestIteration = 0; TestIteration < PerfTestRepeats; ++TestIteration) {
