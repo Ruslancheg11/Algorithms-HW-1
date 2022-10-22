@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <generator.hpp>
 #include <iomanip>
 #include <iostream>
@@ -13,9 +14,9 @@ auto get_random_int(const size_t LowerBound, const size_t UpperBound) -> size_t 
 
 void print_matrix(const TMatrix& Matrix) {
     for (auto& Row: Matrix) {
-        for (auto Cell: Row) {
-            std::cout << std::setw(10) << std::right << Cell << ' ';
-        }
+        std::for_each(Row.begin(), Row.end(), [](const size_t El) {
+            std::cout << std::setw(10) << std::right << El << ' ';
+        });
         std::cout << '\n';
     }
 }
