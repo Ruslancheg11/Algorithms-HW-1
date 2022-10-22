@@ -14,7 +14,7 @@ TEST(GeneratorUnitTest, get_random_int) {
 }
 
 TEST(GeneratorUnitTest, generate) {
-    constexpr uint32_t RowAmount = 10, ColumnAmount = 10;
+    constexpr uint32_t RowAmount = 1000, ColumnAmount = 1000;
     auto MyMatrix = generate(ColumnAmount, RowAmount);
     for (size_t Row = 0; Row < RowAmount; ++Row) {
         for (size_t Column = 0; Column < ColumnAmount; ++Column) {
