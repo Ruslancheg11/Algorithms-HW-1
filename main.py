@@ -1,25 +1,13 @@
-import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from scipy.interpolate import interp1d
+from scipy.ndimage import gaussian_filter1d
 
 GlobalPath = 'log/Perf/'
 
 
-def make_ideal(x_list: list, y_list: list, length: int) -> pd.DataFrame:
-    new_x_list = np.array([])
-    new_y_list = np.array([])
-    for x, y in zip(x_list, y_list):
-        for _ in range(length // len(x_list)):
-            np.append(new_x_list, x)
-            np.append(new_y_list, y)
-    return pd.DataFrame(new_x_list, new_y_list)
-
-
-def smooth_chart(x_list: list, y_list: list) -> np.ndarray:
-    spl = interp1d(x_list, y_list, kind='cubic')
-    new_data = np.linspace(min(x_list), max(x_list), 100)
-    return spl(new_data)
+def smooth_chart(data_x: list, data_y: list, intensity: float = 0.1) -> pd.DataFrame:
+    new_y = gaussian_filter1d(data_y, sigma=intensity)
+    return pd.DataFrame(new_y, data_x)
 
 
 def read_data(filename: str) -> pd.DataFrame:
@@ -28,65 +16,144 @@ def read_data(filename: str) -> pd.DataFrame:
     return data
 
 
-def main() -> None:
-    linear_data = read_data('linear_search.csv')
-    binary_data = read_data('binary_search.csv')
-    staircase_data = read_data('staircase_search.csv')
-    vert_binary_data = read_data('vert_binary_search.csv')
+def show_by_columns(time_kind: str, intensity: float = 0.1) -> None:
+    fig, ax = plt.subplots(num='Chart', layout='constrained', dpi=225)
 
-    linear_data.reindex(index=linear_data.index[::-1])
-    binary_data.reindex(index=binary_data.index[::-1])
-    staircase_data.reindex(index=staircase_data.index[::-1])
-    vert_binary_data.reindex(index=vert_binary_data.index[::-1])
+    x_max = int(linear_data['Columns'].max())
+    x_min = int(linear_data['Columns'].min())
 
-    fig, ax = plt.subplots(figsize=(5, 3.5), layout='constrained', dpi=225)
+    column_min = linear_data['Columns'].min()
+    column_max = linear_data['Columns'].max()
 
-    # rows_by_columns_ratio = [x / y for x, y in zip(linear_data['Rows'].values, linear_data['Columns'])]
-    #
-    # ax.plot(rows_by_columns_ratio, linear_data['Time'].values,
-    #         label='linear search', color='black')
-    #
-    # ax.plot(rows_by_columns_ratio, binary_data['Time'].values,
-    #         label='binary search', color='orange')
-    #
-    # ax.plot(rows_by_columns_ratio, staircase_data['Time'].values,
-    #         label='staircase search', color='purple')
-    #
-    # ax.plot(rows_by_columns_ratio, vert_binary_data['Time'].values,
-    #         label='vertical binary search', color='pink')
+    assert (linear_data["Rows"].max() == linear_data["Rows"].min())
+    row = linear_data["Rows"][0]
+    x_cross_point = row
 
-    rows_multiply_columns = [x * y for x, y in zip(linear_data['Rows'].values, linear_data['Columns'])]
+    smooth_horizontal_binary = smooth_chart(horizontal_binary_data['Columns'].values,
+                                            horizontal_binary_data[time_kind].values,
+                                            intensity)
 
-    ax.plot(rows_multiply_columns, linear_data['Time'].values,
+    smooth_vertical_binary = smooth_chart(vertical_binary_data['Columns'].values,
+                                          vertical_binary_data[time_kind].values,
+                                          intensity)
+
+    smooth_linear_data = smooth_chart(linear_data['Columns'].values,
+                                      linear_data[time_kind].values,
+                                      intensity)
+
+    smooth_staircase_data = smooth_chart(staircase_data['Columns'].values,
+                                         staircase_data[time_kind].values,
+                                         intensity)
+
+    y_max = max(max(smooth_horizontal_binary.values),
+                max(smooth_vertical_binary.values),
+                max(smooth_staircase_data.values),
+                max(smooth_linear_data.values))
+
+    ax.plot(smooth_linear_data,
+            label='linear search', color='black')
+    ax.plot(smooth_staircase_data,
+            label='staircase search', color='purple')
+    ax.plot(smooth_vertical_binary,
+            label='vertical binary search', color='pink')
+    ax.plot(smooth_horizontal_binary,
+            label='horizontal binary search', color='orange')
+
+    ax.set_ylabel('ms', rotation=0, loc='bottom')
+    ax.set_xlabel(f'Input data: Matrix [{column_min}..{column_max}]x{row}')
+    ax.set_yticks(ax.get_yticks(), ax.get_yticklabels(), rotation=0)
+    ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=-45)
+    ax.axvline(x=x_cross_point, linestyle='-', label='Columns = Rows', color='cyan')
+    ax.fill_between((x_min, x_cross_point), y_max, label='Columns < Rows', color='brown')
+    ax.fill_between((x_cross_point, x_max), y_max, label='Columns > Rows', color='olive')
+
+    ax.legend(loc='upper right')
+
+    ax.set_yscale('symlog')
+    # ax.set_xscale('symlog')
+
+    plt.title(time_kind)
+    plt.show()
+
+
+def show_by_rows_and_columns_ratio(time_kind: str, intensity: float = 0.1) -> None:
+    fig, ax = plt.subplots(num='Chart', layout='constrained', dpi=225)
+
+    rows_by_columns_ratio = [row / column for row, column in zip(linear_data['Rows'], linear_data['Columns'])]
+
+    x_max = max(rows_by_columns_ratio)
+    x_min = min(rows_by_columns_ratio)
+
+    assert (linear_data["Rows"].max() == linear_data["Rows"].min())
+    row = linear_data["Rows"][0]
+    x_cross_point = 1.0
+
+    smooth_horizontal_binary = smooth_chart(rows_by_columns_ratio,
+                                            horizontal_binary_data[time_kind].values,
+                                            intensity)
+
+    smooth_vertical_binary = smooth_chart(rows_by_columns_ratio,
+                                          vertical_binary_data[time_kind].values,
+                                          intensity)
+
+    smooth_linear_data = smooth_chart(rows_by_columns_ratio,
+                                      linear_data[time_kind].values,
+                                      intensity)
+
+    smooth_staircase_data = smooth_chart(rows_by_columns_ratio,
+                                         staircase_data[time_kind].values,
+                                         intensity)
+
+    y_max = max(max(smooth_horizontal_binary.values),
+                max(smooth_vertical_binary.values),
+                max(smooth_staircase_data.values),
+                max(smooth_linear_data.values))
+
+    ax.plot(smooth_linear_data,
             label='linear search', color='black')
 
-    ax.plot(rows_multiply_columns, binary_data['Time'].values,
-            label='binary search', color='orange')
+    ax.plot(smooth_horizontal_binary,
+            label='horizontal binary search', color='orange')
 
-    ax.plot(rows_multiply_columns, staircase_data['Time'].values,
+    ax.plot(smooth_staircase_data,
             label='staircase search', color='purple')
 
-    ax.plot(rows_multiply_columns, vert_binary_data['Time'].values,
+    ax.plot(smooth_vertical_binary,
             label='vertical binary search', color='pink')
 
-    # ax.plot(linear_data['Columns'].values, linear_data['Time'].values,
-    #         label='linear search', color='black')
-    #
-    # ax.plot(binary_data['Columns'].values, binary_data['Time'].values,
-    #         label='binary search', color='orange')
-    #
-    # ax.plot(staircase_data['Columns'].values, staircase_data['Time'].values,
-    #         label='staircase search', color='purple')
-    #
-    # ax.plot(vert_binary_data['Columns'].values, vert_binary_data['Time'].values,
-    #         label='vertical binary search', color='pink')
+    column_min = linear_data['Columns'].min()
+    column_max = linear_data['Columns'].max()
+    ax.set_ylabel('ms', rotation=0, loc='bottom')
+    ax.set_xlabel(f'Input data: [{column_min}..{column_max}]/{row}')
 
-    ax.set_ylabel('Time[ms]')
-    ax.set_xlabel('Input data')
-    ax.set_yscale('log')
-    ax.set_xscale('log')
-    ax.legend()
+    ax.set_yticks(ax.get_yticks(), ax.get_yticklabels(), rotation=0)
+    ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=-45)
+
+    ax.axvline(x=x_cross_point, linestyle='-', label='Columns = Rows', color='cyan')
+
+    ax.fill_between((x_min, x_cross_point), y_max, label='Columns < Rows',
+                    color='brown')
+    ax.fill_between((x_cross_point, x_max), y_max, label='Columns > Rows',
+                    color='olive')
+
+    ax.legend(loc='upper right')
+
+    ax.set_yscale('symlog')
+    # ax.set_xscale('symlog')
+
+    plt.title(time_kind)
     plt.show()
+
+
+linear_data = read_data('GCC' + 'linear_search.csv')
+horizontal_binary_data = read_data('GCC' + 'horizontal_binary_search.csv')
+staircase_data = read_data('GCC' + 'staircase_search.csv')
+vertical_binary_data = read_data('GCC' + 'vertical_binary_search.csv')
+
+
+def main() -> None:
+    show_by_columns(time_kind="Avg", intensity=1)
+    show_by_rows_and_columns_ratio(time_kind="Avg", intensity=2)
 
 
 if __name__ == '__main__':
