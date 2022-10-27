@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -gdwarf-2")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_CXX_FLAGS "")
+#set(CMAKE_CXX_FLAGS " -Wall -Wextra")
 
 set(PROJECT_NAME Matrix)
 
@@ -56,19 +56,21 @@ set(APPLICATION_ENTRYPOINT
         ) # main.cpp file
 #
 set(PROJECT_SOURCE_FILES_LIST
-        generator.cpp
-        finder.cpp
+        generation.cpp
+        searching.cpp
         ) # Project's cpp files
 #
 set(PROJECT_HEADER_FILES_LIST
-        generator.hpp
-        finder.hpp
+        generation.hpp
+        searching.hpp
         ) # Project's hpp files
 #
 set(TEST_SOURCE_FILES_LIST
         test.cpp
-        generator_test.cpp
-        finder_test.cpp
+        generation_test.cpp
+        searching_test.cpp
+        searching_performance_test.cpp
+        generation_performance_test.cpp
         ) # Test's cpp files
 
 
