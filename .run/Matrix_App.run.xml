@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Matrix_App" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Matrix" TARGET_NAME="Matrix_App" CONFIG_NAME="WSL-GCC-Debug" RUN_TARGET_PROJECT_NAME="Matrix" RUN_TARGET_NAME="Matrix_App">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>

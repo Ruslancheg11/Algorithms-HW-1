@@ -46,7 +46,7 @@ endif()
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/googletest EXCLUDE_FROM_ALL)
 
 set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/benchmark EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/gtest-benchmark EXCLUDE_FROM_ALL)
 
 # user library linkling
 #set(Boost_USE_STATIC_LIBS OFF)
