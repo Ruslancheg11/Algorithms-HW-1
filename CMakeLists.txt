@@ -47,7 +47,8 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(PROJECT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(PROJECT_HDR_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}")
-set(TEST_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
+set(TEST_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/testing/unit")
+set(BENCHMARK_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/testing/benchmark")
 
 
 # For editing
@@ -56,32 +57,40 @@ set(APPLICATION_ENTRYPOINT
         ) # main.cpp file
 #
 set(PROJECT_SOURCE_FILES_LIST
-        generation.cpp
-        searching.cpp
+        matrix.cpp
+        generator.cpp
+        search.cpp
         ) # Project's cpp files
 #
 set(PROJECT_HEADER_FILES_LIST
-        generation.hpp
-        searching.hpp
+        matrix.hpp
+        generator.hpp
+        search.hpp
         ) # Project's hpp files
 #
 set(TEST_SOURCE_FILES_LIST
-        test.cpp
-        generation_test.cpp
-        searching_test.cpp
-        searching_performance_test.cpp
-        generation_performance_test.cpp
+        test_main.cpp
+        test_utility.cpp
+        generator_test.cpp
+        search_test.cpp
         ) # Test's cpp files
+
+set(BENCHMARK_SOURCE_FILES_LIST
+        benchmark_main.cpp
+        generator_benchmark.cpp
+        ) # Benchmark's cpp files
 
 
 # shortcuts
 set(PROJECT_Lib "${PROJECT_NAME}_Lib")
 set(PROJECT_App "${PROJECT_NAME}_App")
 set(PROJECT_Test "${PROJECT_NAME}_Test")
+set(PROJECT_Benchmark "${PROJECT_NAME}_Benchmark")
 #
 set(PROJECT_SOURCE_FILES)
 set(PROJECT_HEADER_FILES)
 set(TEST_SOURCE_FILES)
+set(BENCHMARK_SOURCE_FILES)
 #
 
 
@@ -100,11 +109,16 @@ foreach(FILE IN LISTS TEST_SOURCE_FILES_LIST)
     list(APPEND TEST_SOURCE_FILES "${TEST_SRC_DIR}/${FILE}")
 endforeach()
 #
+foreach(FILE IN LISTS BENCHMARK_SOURCE_FILES_LIST)
+    list(APPEND BENCHMARK_SOURCE_FILES "${BENCHMARK_SRC_DIR}/${FILE}")
+endforeach()
+#
 
 
 # Creating library of the project, in order to link it with gtest
 message(STATUS "Building ${PROJECT_NAME} as ${PROJECT_BUILD_TYPE} library")
 add_library(${PROJECT_Lib} ${PROJECT_BUILD_TYPE} ${PROJECT_SOURCE_FILES} ${PROJECT_HEADER_FILES})
+target_compile_options(${PROJECT_Lib} PUBLIC -DCMAKE_BUILD_TYPE=Release)
 
 
 # In order to get rid of "..." and "../../src" in #include directives
@@ -117,8 +131,8 @@ else()
 endif()
 #
 
-add_subdirectory(libs)
-add_subdirectory(test)
+add_subdirectory(external)
+add_subdirectory(testing)
 
 if(APPLICATION_ENTRYPOINT_FILE)
 

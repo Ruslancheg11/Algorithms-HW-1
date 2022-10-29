@@ -1,10 +1,10 @@
+#include <generator.hpp>
 #include <iostream>
-#include <generation.hpp>
-#include <searching.hpp>
-
+#include <matrix.hpp>
 
 int main() {
-    auto m = generate_random(10, 10);
-    print_matrix(m);
+    auto MyMatrix = matrix(20, 20);
+    matrix::generator::A(MyMatrix);
+    matrix::generator::B(MyMatrix);
     return 0;
 }

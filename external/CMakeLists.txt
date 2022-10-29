@@ -36,6 +36,18 @@ else()
     message(STATUS "No header-only libraries to include")
 endif()
 
+
+if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
+    # to get rid of the stupid warning "***WARNING*** Library was built as DEBUG. Timings may be affected"
+    # from benchmark library which appears even if you compiled it all in release mode
+    add_definitions(-DNDEBUG)
+endif()
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/googletest EXCLUDE_FROM_ALL)
+
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/benchmark EXCLUDE_FROM_ALL)
+
 # user library linkling
 #set(Boost_USE_STATIC_LIBS OFF)
 #set(Boost_USE_MULTITHREADED ON)
