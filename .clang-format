@@ -23,7 +23,7 @@ AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterNamespace: true
-  AfterClass: true
+  AfterClass: false
   AfterCaseLabel: false
   AfterControlStatement: Never
   BeforeElse: false
