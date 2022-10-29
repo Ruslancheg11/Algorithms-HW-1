@@ -69,6 +69,7 @@ auto matrix::search::binary(const matrix& Matrix,
                             const size_t Target) -> bool {
     constexpr double MagicCoefficient = 1.13;
     /*
+     * # TODO
      * I don't know why, but there is an interesting thing:
      * When you run both vertical and horizontal binary searches on the same matrix
      * with the same rows and columns vertical search is slightly faster.

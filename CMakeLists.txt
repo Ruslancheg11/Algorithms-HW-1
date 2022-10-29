@@ -62,11 +62,15 @@ set(PROJECT_SOURCE_FILES_LIST
         search.cpp
         ) # Project's cpp files
 #
+#
+#
 set(PROJECT_HEADER_FILES_LIST
         matrix.hpp
         generator.hpp
         search.hpp
         ) # Project's hpp files
+#
+#
 #
 set(TEST_SOURCE_FILES_LIST
         test_main.cpp
@@ -74,7 +78,9 @@ set(TEST_SOURCE_FILES_LIST
         generator_test.cpp
         search_test.cpp
         ) # Test's cpp files
-
+#
+#
+#
 set(BENCHMARK_SOURCE_FILES_LIST
         benchmark_main.cpp
         generator_benchmark.cpp

@@ -4,7 +4,9 @@
 #include <search.hpp>
 #include <test_utility.hpp>
 
-class SearchUnitTest: public ::testing::Test {
+using ::testing::Test;
+
+class SearchUnitTest: public Test {
 protected:
     std::vector<uint32_t> ColumnsSet;
     std::vector<uint32_t> RowsSet;
@@ -26,7 +28,7 @@ TEST_F(SearchUnitTest, Linear) {
     for (auto Rows: RowsSet) {
         for (auto Columns: ColumnsSet) {
             matrix MyMatrix(Rows, Columns);
-            matrix::generator::A(MyMatrix);
+            matrix::generator::C(MyMatrix);
 
             EXPECT_TRUE(MatrixIsInCorrectOrder(MyMatrix, Rows, Columns));
 
@@ -43,7 +45,7 @@ TEST_F(SearchUnitTest, Binary) {
     for (auto Rows: RowsSet) {
         for (auto Columns: ColumnsSet) {
             matrix MyMatrix(Rows, Columns);
-            matrix::generator::A(MyMatrix);
+            matrix::generator::C(MyMatrix);
 
             EXPECT_TRUE(MatrixIsInCorrectOrder(MyMatrix, Rows, Columns));
 
@@ -60,7 +62,7 @@ TEST_F(SearchUnitTest, Staircase) {
     for (auto Rows: RowsSet) {
         for (auto Columns: ColumnsSet) {
             matrix MyMatrix(Rows, Columns);
-            matrix::generator::A(MyMatrix);
+            matrix::generator::C(MyMatrix);
 
             EXPECT_TRUE(MatrixIsInCorrectOrder(MyMatrix, Rows, Columns));
 
@@ -77,7 +79,7 @@ TEST_F(SearchUnitTest, Staircase_with_binary) {
     for (auto Rows: RowsSet) {
         for (auto Columns: ColumnsSet) {
             matrix MyMatrix(Rows, Columns);
-            matrix::generator::A(MyMatrix);
+            matrix::generator::C(MyMatrix);
 
             EXPECT_TRUE(MatrixIsInCorrectOrder(MyMatrix, Rows, Columns));
 

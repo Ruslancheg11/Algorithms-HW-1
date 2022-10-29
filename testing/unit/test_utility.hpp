@@ -5,6 +5,10 @@
 #include <matrix.hpp>
 /* END OF INCLUDING SECTION */
 
-auto MatrixIsInCorrectOrder(const matrix& Matrix, uint32_t Rows, uint32_t Columns) -> ::testing::AssertionResult;
+using ::testing::AssertionResult;
+using ::testing::AssertionSuccess;
+using ::testing::AssertionFailure;
+
+auto MatrixIsInCorrectOrder(const matrix& Matrix, uint32_t Rows, uint32_t Columns) -> AssertionResult;
 
 #endif // TEST_PY_TEST_GENERAL_HPP
