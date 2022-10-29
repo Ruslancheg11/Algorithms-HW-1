@@ -8,9 +8,10 @@ using ::testing::Test;
 using ::testing::TestWithParam;
 using ::testing::ValuesIn;
 
-// TODO: MinGW-GCC v12.0.1 x64 doesn't work with these parametrized tests by some reason
+// FIXME: MinGW-GCC v12.0.1 x64 doesn't work with these parametrized tests by some reason
+// Update: WSL-GCC v11.2.0 x64 works just fine
 
-#if __clang__
+#if (!__MINGW64__ || __clang__)
 
 class GeneratorUnitTest: public TestWithParam<std::tuple<uint32_t, uint32_t>> {
 public:
