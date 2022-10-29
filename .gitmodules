@@ -1,0 +1,9 @@
+[submodule "libs/googletest"]
+	path = libs/googletest
+	url = git@github.com:google/googletest.git
+[submodule "libs/gtest-parallel"]
+	path = libs/gtest-parallel
+	url = git@github.com:google/gtest-parallel.git
+[submodule "libs/benchmark"]
+	path = libs/benchmark
+	url = git@github.com:google/benchmark.git
