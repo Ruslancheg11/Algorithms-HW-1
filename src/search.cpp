@@ -17,10 +17,10 @@ auto matrix::search::linear(const matrix& Matrix,
 }
 
 auto vertical_lower_bound(const matrix& Matrix,
-                            const uint32_t ColumnIndex,
-                            const size_t Target,
-                            int Greater,
-                            int Smallest) -> int {
+                          const uint32_t ColumnIndex,
+                          const size_t Target,
+                          int Greater,
+                          int Smallest) -> int {
     for (; Smallest - Greater > 1;) {
         int Middle = (Smallest + Greater) / 2;
         if (Matrix[Middle][ColumnIndex] > Target) {
@@ -33,10 +33,10 @@ auto vertical_lower_bound(const matrix& Matrix,
 }
 
 auto vertical_upper_bound(const matrix& Matrix,
-                            const uint32_t ColumnIndex,
-                            const size_t Target,
-                            int Greater,
-                            int Smallest) -> int {
+                          const uint32_t ColumnIndex,
+                          const size_t Target,
+                          int Greater,
+                          int Smallest) -> int {
     // Wrong
     for (; Greater <= Smallest;) {
         int Middle = (Smallest + Greater) / 2;
@@ -50,10 +50,10 @@ auto vertical_upper_bound(const matrix& Matrix,
 }
 
 auto horizontal_lower_bound(const matrix& Matrix,
-                              const uint32_t RowIndex,
-                              const size_t Target,
-                              int Greater,
-                              int Smallest) -> int {
+                            const uint32_t RowIndex,
+                            const size_t Target,
+                            int Greater,
+                            int Smallest) -> int {
     for (; Smallest - Greater > 1;) {
         int Middle = (Smallest + Greater) / 2;
         if (Matrix[RowIndex][Middle] > Target) {
@@ -89,15 +89,19 @@ auto matrix::search::binary(const matrix& Matrix,
 
     if (static_cast<uint32_t>(Rows * MagicCoefficient) >= Columns) {
         for (int ColumnIndex = 0; ColumnIndex < Columns; ++ColumnIndex) {
-            if (Matrix[vertical_lower_bound(Matrix, ColumnIndex, Target, 0, Rows)][ColumnIndex] == Target) {
-                return true;
+            if (Matrix[0][ColumnIndex] <= Target && Target <= Matrix[Rows - 1][ColumnIndex]) {
+                if (Matrix[vertical_lower_bound(Matrix, ColumnIndex, Target, 0, Rows)][ColumnIndex] == Target) {
+                    return true;
+                }
             }
         }
 
     } else {
         for (int RowIndex = 0; RowIndex < Rows; ++RowIndex) {
-            if (Matrix[RowIndex][horizontal_lower_bound(Matrix, RowIndex, Target, 0, Columns)] == Target) {
-                return true;
+            if (Matrix[RowIndex][0] <= Target && Target <= Matrix[RowIndex][Columns - 1]) {
+                if (Matrix[RowIndex][horizontal_lower_bound(Matrix, RowIndex, Target, 0, Columns)] == Target) {
+                    return true;
+                }
             }
         }
     }
@@ -138,7 +142,9 @@ auto matrix::search::staircase_with_binary(const matrix& Matrix,
         }
         if (Matrix[RowIndex][ColumnIndex] > Target) {
             ColumnIndex = horizontal_lower_bound(Matrix, RowIndex, Target, 0, ColumnIndex);
+//            --ColumnIndex;
         } else {
+//            ++RowIndex;
             RowIndex = vertical_upper_bound(Matrix, ColumnIndex, Target, RowIndex, Rows);
         }
     }
