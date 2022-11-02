@@ -68,9 +68,8 @@ TEST_P(GeneratorUnitTest, WrongMatrix) {
             << " Matrix is: " << Rows << "x" << Columns;
 }
 
-constexpr uint32_t ColumnsSet[] = {9, 10, 11, 49, 50, 51, 99, 100, 101, 1000};
-constexpr uint32_t RowsSet[] = {9, 10, 11, 49, 50, 51, 99, 100, 101, 1000};
-
+constexpr uint32_t ColumnsSet[] = {9, 10, 11, 49, 50, 51, 99, 100, 101};
+constexpr uint32_t RowsSet[] = {9, 10, 11, 49, 50, 51, 99, 100, 101};
 
 INSTANTIATE_TEST_SUITE_P(Generator,
                          GeneratorUnitTest,
