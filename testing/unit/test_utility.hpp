@@ -5,9 +5,9 @@
 #include <matrix.hpp>
 /* END OF INCLUDING SECTION */
 
+using ::testing::AssertionFailure;
 using ::testing::AssertionResult;
 using ::testing::AssertionSuccess;
-using ::testing::AssertionFailure;
 
 auto MatrixIsInCorrectOrder(const matrix& Matrix, uint32_t Rows, uint32_t Columns) -> AssertionResult;
 

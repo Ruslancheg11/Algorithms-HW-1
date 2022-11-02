@@ -19,7 +19,6 @@ enable_testing()
 option(FORCE_BUILD "Use for running on not configured platform" OFF)
 option(BUILD_INTERFACE "Use for build it like interface library" OFF)
 option(BUILD_SHARED "Use for build it like SHARED library" OFF)
-set(BUILD_GMOCK OFF)
 
 
 if(BUILD_INTERFACE)
@@ -86,6 +85,7 @@ set(TEST_SOURCE_FILES_LIST
 set(BENCHMARK_SOURCE_FILES_LIST
         benchmark_main.cpp
         generator_benchmark.cpp
+        search_benchmark.cpp
         ) # Benchmark's cpp files
 
 
