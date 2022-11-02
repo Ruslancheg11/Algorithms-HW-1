@@ -8,10 +8,11 @@ if(TEST_SOURCE_FILES AND ${GTEST_FOUND})
             GTest::gtest_main)
 
     if(BUILD_GMOCK)
-        target_link_libraries(${PROJECT_Test} GTest::gmock_main)
+        target_link_libraries(${PROJECT_Test}
+                GTest::gmock_main)
     endif()
 
-    # In order to get rid of "..." and "../../src" in #include directives
+    # In order to get rid of the quotes and "../../src" in #include directives
     target_include_directories(${PROJECT_Test} PRIVATE ${PROJECT_HDR_DIR})
     target_include_directories(${PROJECT_Test} PRIVATE ${PROJECT_SRC_DIR})
     target_include_directories(${PROJECT_Test} PRIVATE ${TEST_SRC_DIR})
@@ -26,7 +27,7 @@ if(BENCHMARK_SOURCE_FILES AND ${GTEST_BENCHMARK_FOUND})
             ${PROJECT_Lib}
             benchmark::benchmark_main)
 
-    # In order to get rid of "..." and "../../src" in #include directives
+    # In order to get rid of the quotes and "../../src" in #include directives
     target_include_directories(${PROJECT_Benchmark} PRIVATE ${PROJECT_HDR_DIR})
     target_include_directories(${PROJECT_Benchmark} PRIVATE ${PROJECT_SRC_DIR})
 endif()
