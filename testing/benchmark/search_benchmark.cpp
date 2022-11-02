@@ -50,18 +50,7 @@ public:
 
 BENCHMARK_DEFINE_F(SearchBenchmark, Search)
 (benchmark::State& state) {
-    switch (static_cast<TargetType>(state.range(2))) {
-        case (TargetType::A): {
-            Target = get_A_Target(Columns);
-            break;
-        }
-        case (TargetType::B): {
-            Target = get_B_Target(Columns);
-            break;
-        }
-    }
-
-    switch (static_cast<GeneratorType>(state.range(3))) {
+    switch (static_cast<GeneratorType>(state.range(2))) {
         case (GeneratorType::A): {
             matrix::generator::A(MyMatrix);
             break;
@@ -72,6 +61,17 @@ BENCHMARK_DEFINE_F(SearchBenchmark, Search)
         }
         case (GeneratorType::C): {
             matrix::generator::C(MyMatrix);
+            break;
+        }
+    }
+
+    switch (static_cast<TargetType>(state.range(3))) {
+        case (TargetType::A): {
+            Target = get_A_Target(Columns);
+            break;
+        }
+        case (TargetType::B): {
+            Target = get_B_Target(Columns);
             break;
         }
     }
@@ -122,7 +122,7 @@ std::vector<int64_t> SearchTypes = {
         static_cast<int64_t>(SearchType::StaircaseWithExp),
 };
 
-std::vector<std::string> ArgNames = {"Rows", "Columns", "Target", "Generator", "Search"};
+std::vector<std::string> ArgNames = {"Rows", "Columns", "Generator", "Target", "Search"};
 
-BENCHMARK_REGISTER_F(SearchBenchmark, Search)->ArgNames(ArgNames)->ArgsProduct({{0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000}, {0x2000}, TargetTypes, GeneratorTypes, SearchTypes});
+BENCHMARK_REGISTER_F(SearchBenchmark, Search)->ArgNames(ArgNames)->ArgsProduct({{0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000}, {0x2000}, GeneratorTypes, TargetTypes, SearchTypes});
 // BENCHMARK_REGISTER_F(SearchBenchmark, Search)->ArgNames(ArgNames)->ArgsProduct({{0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100}, {0x2000}, TargetTypes, GeneratorTypes, SearchTypes});
