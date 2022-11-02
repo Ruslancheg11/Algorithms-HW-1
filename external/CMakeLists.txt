@@ -36,25 +36,38 @@ else()
     message(STATUS "No header-only libraries to include")
 endif()
 
+set(GTEST_PATH "${CMAKE_CURRENT_SOURCE_DIR}/googletest")
+set(GTEST_BENCHMARK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/gtest-benchmark")
 
-if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
-    # to get rid of the stupid warning "***WARNING*** Library was built as DEBUG. Timings may be affected"
-    # from benchmark library which appears even if you compiled it all in release mode
-    add_definitions(-DNDEBUG)
+
+if(EXISTS "${GTEST_PATH}/CMakeLists.txt")
+    set(GTEST_FOUND ON PARENT_SCOPE)
+    message(STATUS "Found gtest")
+
+    add_subdirectory(${GTEST_PATH} EXCLUDE_FROM_ALL)
+else()
+    set(GTEST_FOUND OFF PARENT_SCOPE)
+    message(STATUS "gtest is not found")
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/googletest EXCLUDE_FROM_ALL)
+if(EXISTS "${GTEST_BENCHMARK_PATH}/CMakeLists.txt")
+    set(GTEST_BENCHMARK_FOUND ON PARENT_SCOPE)
+    message(STATUS "Found gtest-benchmark")
 
-set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/gtest-benchmark EXCLUDE_FROM_ALL)
+    if (${GTEST_FOUND})
+        set(GOOGLETEST_PATH ${GTEST_PATH})
+    else()
+        set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+    endif()
 
-# user library linkling
-#set(Boost_USE_STATIC_LIBS OFF)
-#set(Boost_USE_MULTITHREADED ON)
-#set(Boost_USE_STATIC_RUNTIME OFF)
-#find_package(Boost 1.80.0)
-#
-#if(Boost_FOUND)
-#    include_directories(${Boost_INCLUDE_DIRS})
-#    target_link_libraries(${PROJECT_Lib} ${Boost_LIBRARIES})
-#endif()
+    if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
+        # to get rid of the stupid warning "***WARNING*** Library was built as DEBUG. Timings may be affected"
+        # from benchmark library which appears even if you compiled it all in release mode
+        add_definitions(-DNDEBUG)
+    endif()
+
+    add_subdirectory(${GTEST_BENCHMARK_PATH} EXCLUDE_FROM_ALL)
+else()
+    set(GTEST_BENCHMARK_FOUND OFF PARENT_SCOPE)
+    message(STATUS "gtest-benchmark is not found")
+endif()
