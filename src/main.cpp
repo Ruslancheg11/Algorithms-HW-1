@@ -1,6 +1,6 @@
+#include <base_matrix.hpp>
 #include <generator.hpp>
 #include <iostream>
-#include <matrix.hpp>
 
 int main() {
     auto MyMatrix = matrix(20, 20);

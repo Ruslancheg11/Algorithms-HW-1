@@ -58,6 +58,7 @@ set(APPLICATION_ENTRYPOINT
 #
 set(PROJECT_SOURCE_FILES_LIST
         matrix.cpp
+        base_matrix.cpp
         generator.cpp
         search.cpp
         ) # Project's cpp files
@@ -66,6 +67,7 @@ set(PROJECT_SOURCE_FILES_LIST
 #
 set(PROJECT_HEADER_FILES_LIST
         matrix.hpp
+        base_matrix.hpp
         generator.hpp
         search.hpp
         ) # Project's hpp files

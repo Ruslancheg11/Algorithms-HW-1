@@ -1,7 +1,8 @@
-#ifndef TEST_PY_GENERATOR_HPP
-#define TEST_PY_GENERATOR_HPP
+#ifndef GENERATOR_HPP
+#define GENERATOR_HPP
 /* START OF INCLUDING SECTION */
-#include <matrix.hpp>
+#include <base_matrix.hpp>
+#include <random>
 /* END OF INCLUDING SECTION */
 
 class matrix::generator {
@@ -13,4 +14,4 @@ public:
     static void C(matrix& MatrixInstance);
 };
 
-#endif // TEST_PY_GENERATOR_HPP
+#endif // GENERATOR_HPP

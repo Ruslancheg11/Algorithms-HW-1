@@ -1,7 +1,7 @@
-#ifndef TEST_PY_SEARCH_HPP
-#define TEST_PY_SEARCH_HPP
+#ifndef SEARCH_HPP
+#define SEARCH_HPP
 /* START OF INCLUDING SECTION */
-#include <matrix.hpp>
+#include <base_matrix.hpp>
 /* END OF INCLUDING SECTION */
 
 class matrix::search {
@@ -17,4 +17,4 @@ public:
     static auto staircase_with_exponential(const matrix& Matrix, size_t Target) -> bool;
 };
 
-#endif // TEST_PY_SEARCH_HPP
+#endif // SEARCH_HPP
