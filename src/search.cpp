@@ -19,50 +19,49 @@ auto matrix::search::linear(const matrix& Matrix,
 auto vertical_lower_bound(const matrix& Matrix,
                           const uint32_t ColumnIndex,
                           const size_t Target,
-                          int Smallest,
-                          int Greater) -> int {
-    for (; Greater - Smallest > 1;) {
-        int Middle = (Greater + Smallest) / 2;
+                          int Top,
+                          int Bottom) -> int {
+    for (; Bottom - Top > 1;) {
+        int Middle = (Bottom + Top) / 2;
         if (Matrix[Middle][ColumnIndex] > Target) {
-            Greater = Middle;
+            Bottom = Middle;
         } else {
-            Smallest = Middle;
+            Top = Middle;
         }
     }
-    return Greater - 1;
+    return Bottom - 1;
 }
 
 auto vertical_upper_bound(const matrix& Matrix,
                           const uint32_t ColumnIndex,
                           const size_t Target,
-                          int Smallest,
-                          int Greater) -> int {
-    // Wrong
-    for (; Greater - Smallest > 1;) {
-        int Middle = (Greater + Smallest) / 2;
+                          int Top,
+                          int Bottom) -> int {
+    for (; Bottom - Top > 1;) {
+        int Middle = (Bottom + Top) / 2;
         if (Matrix[Middle][ColumnIndex] < Target) {
-            Smallest = Middle;
+            Top = Middle;
         } else {
-            Greater = Middle;
+            Bottom = Middle;
         }
     }
-    return Greater;
+    return Bottom;
 }
 
 auto horizontal_lower_bound(const matrix& Matrix,
                             const uint32_t RowIndex,
                             const size_t Target,
-                            int Smallest,
-                            int Greater) -> int {
-    for (; Greater - Smallest > 1;) {
-        int Middle = (Greater + Smallest) / 2;
+                            int Left,
+                            int Right) -> int {
+    for (; Right - Left > 1;) {
+        int Middle = (Right + Left) / 2;
         if (Matrix[RowIndex][Middle] > Target) {
-            Greater = Middle;
+            Right = Middle;
         } else {
-            Smallest = Middle;
+            Left = Middle;
         }
     }
-    return Greater - 1;
+    return Right - 1;
 }
 
 auto matrix::search::binary(const matrix& Matrix,
@@ -91,7 +90,7 @@ auto matrix::search::binary(const matrix& Matrix,
     if (static_cast<uint32_t>(Rows * MagicCoefficient) >= Columns) {
         for (int ColumnIndex = 0; ColumnIndex < Columns; ++ColumnIndex) {
             if (Matrix[0][ColumnIndex] <= Target && Target <= Matrix[Rows - 1][ColumnIndex]) {
-                if (Matrix[vertical_lower_bound(Matrix, ColumnIndex, Target, 0, Rows)][ColumnIndex] == Target) {
+                if (Target == Matrix[vertical_lower_bound(Matrix, ColumnIndex, Target, 0, static_cast<int>(Rows))][ColumnIndex]) {
                     return true;
                 }
             }
@@ -100,7 +99,7 @@ auto matrix::search::binary(const matrix& Matrix,
     } else {
         for (int RowIndex = 0; RowIndex < Rows; ++RowIndex) {
             if (Matrix[RowIndex][0] <= Target && Target <= Matrix[RowIndex][Columns - 1]) {
-                if (Matrix[RowIndex][horizontal_lower_bound(Matrix, RowIndex, Target, 0, Columns)] == Target) {
+                if (Target == Matrix[RowIndex][horizontal_lower_bound(Matrix, RowIndex, Target, 0, static_cast<int>(Columns))]) {
                     return true;
                 }
             }
@@ -143,10 +142,8 @@ auto matrix::search::staircase_with_binary(const matrix& Matrix,
         }
         if (Matrix[RowIndex][ColumnIndex] > Target) {
             ColumnIndex = horizontal_lower_bound(Matrix, RowIndex, Target, 0, ColumnIndex);
-            //            --ColumnIndex;
         } else {
-            //            ++RowIndex;
-            RowIndex = vertical_upper_bound(Matrix, ColumnIndex, Target, RowIndex, Rows);
+            RowIndex = vertical_upper_bound(Matrix, ColumnIndex, Target, RowIndex, static_cast<int>(Rows));
         }
     }
     return false;
@@ -156,39 +153,39 @@ auto matrix::search::staircase_with_binary(const matrix& Matrix,
 auto vertical_exponential_search(const matrix& Matrix,
                                  const uint32_t ColumnIndex,
                                  const size_t Target,
-                                 int Smallest,
-                                 int Greater) -> int {
-    if (Matrix[Smallest][ColumnIndex] == Target) {
-        return Smallest;
+                                 int Top,
+                                 int Bottom) -> int {
+    if (Matrix[Top][ColumnIndex] == Target) {
+        return Top;
     }
 
     int RightBound = 1;
     int LeftBound = 1;
-    for (; RightBound < Greater && Matrix[RightBound][ColumnIndex] <= Target;) {
+    for (; RightBound < Bottom && Matrix[RightBound][ColumnIndex] <= Target;) {
         LeftBound = RightBound;
         RightBound *= 2;
     }
 
-    return vertical_upper_bound(Matrix, ColumnIndex, Target, LeftBound, std::min(RightBound, Greater));
+    return vertical_upper_bound(Matrix, ColumnIndex, Target, LeftBound - 1, std::min(RightBound, Bottom));
 }
 
 auto horizontal_exponential_search(const matrix& Matrix,
                                    const uint32_t RowIndex,
                                    const size_t Target,
-                                   int Smallest,
-                                   int Greater) -> int {
-    if (Matrix[RowIndex][Greater] == Target) {
-        return Greater;
+                                   int Top,
+                                   int Bottom) -> int {
+    if (Matrix[RowIndex][Bottom] == Target) {
+        return Bottom;
     }
 
-    int RightBound = Greater;
-    int LeftBound = Greater / 2;
-    for (; RightBound < Greater && Matrix[RowIndex][RightBound] <= Target;) {
-        LeftBound = RightBound;
-        RightBound /= 2;
+    int RightBound = Bottom;
+    int LeftBound = Bottom / 2;
+    for (; LeftBound > Top && Matrix[RowIndex][LeftBound] > Target;) {
+        RightBound = LeftBound;
+        LeftBound /= 2;
     }
 
-    return horizontal_lower_bound(Matrix, RowIndex, Target, LeftBound, std::min(RightBound, Greater));
+    return horizontal_lower_bound(Matrix, RowIndex, Target, std::max(LeftBound, Top), RightBound + 1);
 }
 
 auto matrix::search::staircase_with_exponential(const matrix& Matrix,
@@ -205,10 +202,8 @@ auto matrix::search::staircase_with_exponential(const matrix& Matrix,
         }
         if (Matrix[RowIndex][ColumnIndex] > Target) {
             ColumnIndex = horizontal_exponential_search(Matrix, RowIndex, Target, 0, ColumnIndex);
-            //            --ColumnIndex;
         } else {
-            //++RowIndex;
-            RowIndex = vertical_exponential_search(Matrix, ColumnIndex, Target, RowIndex, Rows);
+            RowIndex = vertical_exponential_search(Matrix, ColumnIndex, Target, RowIndex, static_cast<int>(Rows));
         }
     }
     return false;
