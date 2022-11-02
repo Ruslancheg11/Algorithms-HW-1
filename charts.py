@@ -1,19 +1,9 @@
-import pandas as pd
 from matplotlib import pyplot as plt
 
-from charts_info import *
+from general import *
 
 
-def read_data(filename: str) -> pd.DataFrame:
-    with open(file=GlobalPathParsed + filename) as input_file:
-        if 'csv' in filename:
-            data = pd.read_csv(filepath_or_buffer=input_file, sep=',')
-        if 'json' in filename:
-            data = pd.read_json(path_or_buf=input_file)
-    return data
-
-
-def plot_charts(log: bool = False, png_prefix: str = '', **kwargs) -> None:
+def plot_chart(log: bool = False, title: str = None, png_prefix: str = '', **kwargs) -> None:
     plt.close('all')
     fig, ax = plt.subplots(num='Chart', layout='constrained', dpi=225)
 
@@ -28,14 +18,14 @@ def plot_charts(log: bool = False, png_prefix: str = '', **kwargs) -> None:
 
     for run_report in chart_files:
         with open(GlobalPathParsed + run_report) as f:
-            lines.append(read_data(run_report))
+            lines.append(read_data(GlobalPathParsed + run_report))
         name = (run_report.split('_')[-1]).split('.')[0]
         names.append(name)
 
     gen = chart_files[0].split('_')[0]
     target = chart_files[0].split('_')[1]
 
-    title = f"Generator:{gen} Target:{target}"
+    title = f"Generator:{gen} Target:{target}" if title is None else title
     png_name = f"{png_prefix}_{gen}_{target}_Log.png" if log else f"{png_prefix}_{gen}_{target}_Linear.png"
 
     for file in lines:
@@ -53,9 +43,6 @@ def plot_charts(log: bool = False, png_prefix: str = '', **kwargs) -> None:
 
     ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=-45)
     if log:
-        # ax.set_ylim(0)
-        # ax.set_xlim(x_min)
-
         ax.set_yscale('log')
         ax.set_xscale('log')
     if not log:
@@ -70,21 +57,28 @@ def plot_charts(log: bool = False, png_prefix: str = '', **kwargs) -> None:
 
 
 def main() -> None:
-    for gen in GeneratorTypes.keys():
-        for tar in TargetTypes.keys():
-            staircase = get_chart_name(gen, tar, 'Search:2', sep='_', ext='csv')
-            staircase_bin = get_chart_name(gen, tar, 'Search:3', sep='_', ext='csv')
-            staircase_exp = get_chart_name(gen, tar, 'Search:4', sep='_', ext='csv')
-            plot_charts(log=False, png_prefix='First',
-                        staircase=staircase,
-                        staircase_bin=staircase_bin,
-                        staircase_exp=staircase_exp)
+    for target_name, target_key in TargetTypes.items():
+        for generator_name, generator_key in GeneratorTypes.items():
+            for Logarithmic in [True, False]:
+                lines = []
+                for search_name, search_key in SearchTypes.items():
+                    lines.append(get_parsed_name(generator_key, target_key, search_key,
+                                                 ext='csv'))
 
-    first = get_chart_name('Generator:0', 'Target:0', 'Search:4', sep='_', ext='csv')
-    second = get_chart_name('Generator:1', 'Target:1', 'Search:4', sep='_', ext='csv')
-    plot_charts(log=False, png_prefix='Second',
-                staircase_exp_A_A=first,
-                staircase_exp_B_B=second)
+                plot_chart(log=Logarithmic, png_prefix='First',
+                           binary=lines[0],
+                           staircase=lines[1],
+                           staircase_bin=lines[2],
+                           staircase_exp=lines[3])
+
+    first = get_parsed_name(GeneratorTypes['A'], TargetTypes['2N'], SearchTypes['Staircase_exp'],
+                            ext='csv')
+    second = get_parsed_name(GeneratorTypes['B'], TargetTypes['16N'], SearchTypes['Staircase_exp'],
+                             ext='csv')
+
+    plot_chart(log=True, title='Generators A, B, Targets 2N, 16N', png_prefix='Second',
+               staircase_exp_A_2N=first,
+               staircase_exp_B_16N=second)
 
 
 if __name__ == '__main__':

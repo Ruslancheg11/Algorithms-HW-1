@@ -1,34 +1,22 @@
-import json
-import pandas as pd
-
-from charts_info import *
-
-
-def read_data(filename: str) -> pd.DataFrame:
-    with open(file=GlobalPathRow + filename) as input_file:
-        if 'csv' in filename:
-            data = pd.read_csv(filepath_or_buffer=input_file, sep=',')
-        if 'json' in filename:
-            data = pd.read_json(path_or_buf=input_file)
-    return data
+from general import *
 
 
 def parse_benchmark_report(filename: str) -> None:
-    data = json.load(open(GlobalPathRow + filename))
+    data = read_data(GlobalPathRow + filename)
     df = pd.DataFrame(data['benchmarks'])
-    for target_type in TargetTypes.keys():
-        for search_type in SearchTypes.keys():
-            for generator_type in GeneratorTypes.keys():
-                filename = get_chart_name(generator_type, target_type, search_type, sep='_', ext='csv')
-                with open(GlobalPathParsed + filename, "w") as f:
-                    f.write(f'Rows,Columns,Time\n')
-                    for name, cpu_time, run_type in zip(df['name'], df['cpu_time'], df['run_type']):
-                        # if run_type == 'iteration':
-                        #     continue
-                        # if 'median' in name:
-                        if target_type in name and generator_type in name and search_type in name:
+    for target_name, target_key in TargetTypes.items():
+        for search_name, search_key in SearchTypes.items():
+            for generator_name, generator_key in GeneratorTypes.items():
+                filename = get_parsed_name(generator_key, target_key, search_key, ext='csv')
+                buffered_string = f'Rows,Columns,Time\n'
+                for name, cpu_time, repetitions in zip(df['name'], df['cpu_time'], df['repetitions']):
+                    if repetitions == 1 or 'median' in name:
+                        if target_key in name and generator_key in name and search_key in name:
                             attr = dict((x.split(':')) for x in name.split('/')[2::])
-                            f.write(f"{attr['Rows']},{attr['Columns']},{cpu_time}\n")
+                            buffered_string += f"{attr['Rows']},{attr['Columns']},{cpu_time}\n"
+                if buffered_string:
+                    with open(GlobalPathParsed + filename, "w") as f:
+                        f.write(buffered_string)
 
 
 def main() -> None:
