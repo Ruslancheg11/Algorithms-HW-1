@@ -19,7 +19,6 @@ public:
     uint32_t Columns = 8;
     uint32_t Rows = 8;
     matrix MyMatrix;
-    std::vector<int> m;
     SearchUnitTest() = default;
 
     ~SearchUnitTest() override = default;
@@ -27,8 +26,8 @@ public:
     void SetUp() override {
         auto Pair = GetParam();
 
-        Columns = std::get<0>(Pair);
-        Rows = std::get<1>(Pair);
+        Rows = std::get<0>(Pair);
+        Columns = std::get<1>(Pair);
 
         MyMatrix = matrix(Rows, Columns);
         matrix::generator::A(MyMatrix);
@@ -45,6 +44,12 @@ TEST_P(SearchUnitTest, Linear) {
             ASSERT_TRUE(matrix::search::linear(MyMatrix, MyMatrix[Row][Column]));
         }
     }
+
+    ASSERT_FALSE(matrix::search::linear(MyMatrix, -1)); // Less than the first cell
+    ASSERT_FALSE(matrix::search::linear(MyMatrix, MyMatrix[Rows - 1][Columns - 1] + 10)); // Greater than the last cell
+
+    ASSERT_FALSE(matrix::search::linear(MyMatrix, Columns * 2 + 1));
+    ASSERT_FALSE(matrix::search::linear(MyMatrix, Columns * 16 + 1));
 }
 
 TEST_P(SearchUnitTest, Binary) {
@@ -53,6 +58,12 @@ TEST_P(SearchUnitTest, Binary) {
             ASSERT_TRUE(matrix::search::binary(MyMatrix, MyMatrix[Row][Column]));
         }
     }
+
+    ASSERT_FALSE(matrix::search::binary(MyMatrix, -1)); // Less than the first cell
+    ASSERT_FALSE(matrix::search::binary(MyMatrix, MyMatrix[Rows - 1][Columns - 1] + 10)); // Greater than the last cell
+
+    ASSERT_FALSE(matrix::search::binary(MyMatrix, Columns * 2 + 1));
+    ASSERT_FALSE(matrix::search::binary(MyMatrix, Columns * 16 + 1));
 }
 
 TEST_P(SearchUnitTest, Staircase) {
@@ -61,6 +72,12 @@ TEST_P(SearchUnitTest, Staircase) {
             ASSERT_TRUE(matrix::search::staircase(MyMatrix, MyMatrix[Row][Column]));
         }
     }
+
+    ASSERT_FALSE(matrix::search::staircase(MyMatrix, -1)); // Less than the first cell
+    ASSERT_FALSE(matrix::search::staircase(MyMatrix, MyMatrix[Rows - 1][Columns - 1] + 10)); // Greater than the last cell
+
+    ASSERT_FALSE(matrix::search::staircase(MyMatrix, Columns * 2 + 1));
+    ASSERT_FALSE(matrix::search::staircase(MyMatrix, Columns * 16 + 1));
 }
 
 TEST_P(SearchUnitTest, Staircase_with_binary) {
@@ -69,6 +86,12 @@ TEST_P(SearchUnitTest, Staircase_with_binary) {
             ASSERT_TRUE(matrix::search::staircase_with_binary(MyMatrix, MyMatrix[Row][Column]));
         }
     }
+
+    ASSERT_FALSE(matrix::search::staircase_with_binary(MyMatrix, -1)); // Less than the first cell
+    ASSERT_FALSE(matrix::search::staircase_with_binary(MyMatrix, MyMatrix[Rows - 1][Columns - 1] + 10)); // Greater than the last cell
+
+    ASSERT_FALSE(matrix::search::staircase_with_binary(MyMatrix, Columns * 2 + 1));
+    ASSERT_FALSE(matrix::search::staircase_with_binary(MyMatrix, Columns * 16 + 1));
 }
 
 TEST_P(SearchUnitTest, Staircase_with_exponential) {
@@ -77,15 +100,20 @@ TEST_P(SearchUnitTest, Staircase_with_exponential) {
             ASSERT_TRUE(matrix::search::staircase_with_exponential(MyMatrix, MyMatrix[Row][Column]));
         }
     }
+    ASSERT_FALSE(matrix::search::staircase_with_exponential(MyMatrix, -1)); // Less than the first cell
+    ASSERT_FALSE(matrix::search::staircase_with_exponential(MyMatrix, MyMatrix[Rows - 1][Columns - 1] + 10)); // Greater than the last cell
+
+    ASSERT_FALSE(matrix::search::staircase_with_exponential(MyMatrix, Columns * 2 + 1));
+    ASSERT_FALSE(matrix::search::staircase_with_exponential(MyMatrix, Columns * 16 + 1));
 }
 
-constexpr uint32_t ColumnsSet[] = {1, 2, 9, 10, 11, 49, 50, 51, 99, 100, 101, 249, 250, 251};
 constexpr uint32_t RowsSet[] = {1, 2, 9, 10, 11, 49, 50, 51, 99, 100, 101, 249, 250, 251};
+constexpr uint32_t ColumnsSet[] = {1, 2, 9, 10, 11, 49, 50, 51, 99, 100, 101, 249, 250, 251};
 
 INSTANTIATE_TEST_SUITE_P(Search,
                          SearchUnitTest,
-                         Combine(ValuesIn(ColumnsSet),
-                                 ValuesIn(RowsSet)),
+                         Combine(ValuesIn(RowsSet),
+                                 ValuesIn(ColumnsSet)),
                          [](const TestParamInfo<SearchUnitTest::ParamType>& info) -> std::string {
                              std::string TestCaseName;
                              TestCaseName.reserve(16);
