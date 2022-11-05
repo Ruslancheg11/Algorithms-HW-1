@@ -76,9 +76,10 @@ def main() -> None:
     second = get_parsed_name(GeneratorTypes['B'], TargetTypes['16N'], SearchTypes['Staircase_exp'],
                              ext='csv')
 
-    plot_chart(log=True, title='Generators A, B, Targets 2N, 16N', png_prefix='Second',
-               staircase_exp_A_2N=first,
-               staircase_exp_B_16N=second)
+    for Logarithmic in [True, False]:
+        plot_chart(log=Logarithmic, title='Generators A, B, Targets 2N, 16N', png_prefix='Second',
+                   staircase_exp_A_2N=first,
+                   staircase_exp_B_16N=second)
 
 
 if __name__ == '__main__':
