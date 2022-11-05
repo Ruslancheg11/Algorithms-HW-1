@@ -84,13 +84,13 @@ auto matrix::search::binary(const matrix& Matrix,
      *
      */
 
-    const auto Rows = Matrix.Rows_;
-    const auto Columns = Matrix.Columns_;
+    const auto Rows = static_cast<int>(Matrix.Rows_);
+    const auto Columns = static_cast<int>(Matrix.Columns_);
 
     if (static_cast<uint32_t>(Rows * MagicCoefficient) >= Columns) {
         for (int ColumnIndex = 0; ColumnIndex < Columns; ++ColumnIndex) {
             if (Matrix[0][ColumnIndex] <= Target && Target <= Matrix[Rows - 1][ColumnIndex]) {
-                if (Target == Matrix[vertical_lower_bound(Matrix, ColumnIndex, Target, 0, static_cast<int>(Rows))][ColumnIndex]) {
+                if (Target == Matrix[vertical_lower_bound(Matrix, ColumnIndex, Target, 0, Rows)][ColumnIndex]) {
                     return true;
                 }
             }
@@ -99,7 +99,7 @@ auto matrix::search::binary(const matrix& Matrix,
     } else {
         for (int RowIndex = 0; RowIndex < Rows; ++RowIndex) {
             if (Matrix[RowIndex][0] <= Target && Target <= Matrix[RowIndex][Columns - 1]) {
-                if (Target == Matrix[RowIndex][horizontal_lower_bound(Matrix, RowIndex, Target, 0, static_cast<int>(Columns))]) {
+                if (Target == Matrix[RowIndex][horizontal_lower_bound(Matrix, RowIndex, Target, 0, Columns)]) {
                     return true;
                 }
             }
@@ -110,11 +110,11 @@ auto matrix::search::binary(const matrix& Matrix,
 
 auto matrix::search::staircase(const matrix& Matrix,
                                const size_t Target) -> bool {
-    const auto Rows = Matrix.Rows_;
-    const auto Columns = Matrix.Columns_;
+    const auto Rows = static_cast<int>(Matrix.Rows_);
+    const auto Columns = static_cast<int>(Matrix.Columns_);
 
     int RowIndex = 0;
-    int ColumnIndex = static_cast<int>(Columns) - 1;
+    int ColumnIndex = Columns - 1;
 
     for (; RowIndex < Rows && ColumnIndex >= 0;) {
         if (Matrix[RowIndex][ColumnIndex] == Target) {
@@ -128,73 +128,75 @@ auto matrix::search::staircase(const matrix& Matrix,
     }
     return false;
 }
+
 auto matrix::search::staircase_with_binary(const matrix& Matrix,
                                            size_t Target) -> bool {
-    const auto Rows = Matrix.Rows_;
-    const auto Columns = Matrix.Columns_;
+    const auto Rows = static_cast<int>(Matrix.Rows_);
+    const auto Columns = static_cast<int>(Matrix.Columns_);
 
     int RowIndex = 0;
-    int ColumnIndex = static_cast<int>(Columns) - 1;
+    int ColumnIndex = Columns - 1;
 
     for (; RowIndex < Rows && ColumnIndex >= 0;) {
         if (Matrix[RowIndex][ColumnIndex] == Target) {
             return true;
         }
         if (Matrix[RowIndex][ColumnIndex] > Target) {
-            ColumnIndex = horizontal_lower_bound(Matrix, RowIndex, Target, 0, ColumnIndex);
+            ColumnIndex = horizontal_lower_bound(Matrix, RowIndex, Target, 0, ColumnIndex + 1);
         } else {
-            RowIndex = vertical_upper_bound(Matrix, ColumnIndex, Target, RowIndex, static_cast<int>(Rows));
+            RowIndex = vertical_upper_bound(Matrix, ColumnIndex, Target, RowIndex, Rows);
         }
     }
     return false;
 }
 
+auto horizontal_exponential_search(const matrix& Matrix,
+                                   const uint32_t RowIndex,
+                                   const size_t Target,
+                                   int LeftIndex,
+                                   int RightIndex) -> int {
+    if (Matrix[RowIndex][RightIndex] == Target) {
+        return RightIndex;
+    }
+
+    int RightBound = RightIndex;
+    int LeftBound = RightIndex - 1;
+    int Shift = 1;
+    for (; LeftBound > LeftIndex && Matrix[RowIndex][LeftBound] > Target;) {
+        RightBound = LeftBound;
+        LeftBound -= Shift;
+        Shift *= 2;
+    }
+
+    return horizontal_lower_bound(Matrix, RowIndex, Target, std::max(LeftIndex, LeftBound), RightBound + 1);
+}
 
 auto vertical_exponential_search(const matrix& Matrix,
                                  const uint32_t ColumnIndex,
                                  const size_t Target,
-                                 int Top,
-                                 int Bottom) -> int {
-    if (Matrix[Top][ColumnIndex] == Target) {
-        return Top;
+                                 int TopIndex,
+                                 int BottomIndex) -> int {
+    if (Matrix[TopIndex][ColumnIndex] == Target) {
+        return TopIndex;
     }
 
-    int RightBound = 1;
-    int LeftBound = 1;
-    for (; RightBound < Bottom && Matrix[RightBound][ColumnIndex] <= Target;) {
-        LeftBound = RightBound;
-        RightBound *= 2;
+    int UpperBound = TopIndex;
+    int LowerBound = TopIndex + 1;
+    for (; LowerBound < BottomIndex && Matrix[LowerBound][ColumnIndex] < Target;) {
+        UpperBound = LowerBound;
+        LowerBound *= 2;
     }
 
-    return vertical_upper_bound(Matrix, ColumnIndex, Target, LeftBound - 1, std::min(RightBound, Bottom));
-}
-
-auto horizontal_exponential_search(const matrix& Matrix,
-                                   const uint32_t RowIndex,
-                                   const size_t Target,
-                                   int Top,
-                                   int Bottom) -> int {
-    if (Matrix[RowIndex][Bottom] == Target) {
-        return Bottom;
-    }
-
-    int RightBound = Bottom;
-    int LeftBound = Bottom / 2;
-    for (; LeftBound > Top && Matrix[RowIndex][LeftBound] > Target;) {
-        RightBound = LeftBound;
-        LeftBound /= 2;
-    }
-
-    return horizontal_lower_bound(Matrix, RowIndex, Target, std::max(LeftBound, Top), RightBound + 1);
+    return vertical_upper_bound(Matrix, ColumnIndex, Target, UpperBound, std::min(LowerBound, BottomIndex) + 1);
 }
 
 auto matrix::search::staircase_with_exponential(const matrix& Matrix,
                                                 size_t Target) -> bool {
-    const auto Rows = Matrix.Rows_;
-    const auto Columns = Matrix.Columns_;
+    const auto Rows = static_cast<int>(Matrix.Rows_);
+    const auto Columns = static_cast<int>(Matrix.Columns_);
 
     int RowIndex = 0;
-    int ColumnIndex = static_cast<int>(Columns) - 1;
+    int ColumnIndex = Columns - 1;
 
     for (; RowIndex < Rows && ColumnIndex >= 0;) {
         if (Matrix[RowIndex][ColumnIndex] == Target) {
@@ -203,7 +205,7 @@ auto matrix::search::staircase_with_exponential(const matrix& Matrix,
         if (Matrix[RowIndex][ColumnIndex] > Target) {
             ColumnIndex = horizontal_exponential_search(Matrix, RowIndex, Target, 0, ColumnIndex);
         } else {
-            RowIndex = vertical_exponential_search(Matrix, ColumnIndex, Target, RowIndex, static_cast<int>(Rows));
+            RowIndex = vertical_exponential_search(Matrix, ColumnIndex, Target, RowIndex, Rows - 1);
         }
     }
     return false;
