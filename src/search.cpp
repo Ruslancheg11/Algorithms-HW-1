@@ -66,12 +66,11 @@ auto horizontal_lower_bound(const matrix& Matrix,
 
 auto matrix::search::binary(const matrix& Matrix,
                             const size_t Target) -> bool {
-    constexpr double MagicCoefficient = 1.13;
+    constexpr int MagicCoefficient = 4;
     /*
-     * # TODO
      * I don't know why, but there is an interesting thing:
      * When you run both vertical and horizontal binary searches on the same matrix
-     * with the same rows and columns vertical search is slightly faster.
+     * with the same rows and columns, vertical search is slightly faster.
      * I think it is related to some compiler-optimization stuff, but it is still a bit strange.
      *
      * I would have understood, if it would be in the opposite way,
@@ -82,12 +81,24 @@ auto matrix::search::binary(const matrix& Matrix,
      * Generally speaking, vertical search by some reasons is slightly faster in the same conditions,
      * so we are taking it into account, when choosing which one to run by multiplying Rows by this coefficient
      *
+     *
+     * Update
+     * It seems, that it is cache-line optimization stuff:
+     * Both vertical and horizontal searches have a great number of cache misses,
+     * because all random access algorithms are not about cache-line optimization.
+     *
+     * In the same time, linear horizontal traversing stores every horizontal fragment in the cache,
+     * whereas linear vertical traversing misses every new cell.
+     * Exactly because that reason, we transpose matrix, before multiplying.
+     *
+     * I find by a several runs, that 4 fits perfectly for this MagicCoefficient,
+     * so I remove TO-DO label
      */
 
     const auto Rows = static_cast<int>(Matrix.Rows_);
     const auto Columns = static_cast<int>(Matrix.Columns_);
 
-    if (static_cast<uint32_t>(Rows * MagicCoefficient) >= Columns) {
+    if (Rows * MagicCoefficient >= Columns) {
         for (int ColumnIndex = 0; ColumnIndex < Columns; ++ColumnIndex) {
             if (Matrix[0][ColumnIndex] <= Target && Target <= Matrix[Rows - 1][ColumnIndex]) {
                 if (Target == Matrix[vertical_lower_bound(Matrix, ColumnIndex, Target, 0, Rows)][ColumnIndex]) {
@@ -95,7 +106,6 @@ auto matrix::search::binary(const matrix& Matrix,
                 }
             }
         }
-
     } else {
         for (int RowIndex = 0; RowIndex < Rows; ++RowIndex) {
             if (Matrix[RowIndex][0] <= Target && Target <= Matrix[RowIndex][Columns - 1]) {
