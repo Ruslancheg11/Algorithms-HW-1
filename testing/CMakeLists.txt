@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.13)
-
 if(TEST_SOURCE_FILES AND ${GTEST_FOUND})
 
     add_executable(${PROJECT_Test} ${TEST_SOURCE_FILES})
@@ -17,7 +16,8 @@ if(TEST_SOURCE_FILES AND ${GTEST_FOUND})
     target_include_directories(${PROJECT_Test} PRIVATE ${PROJECT_SRC_DIR})
     target_include_directories(${PROJECT_Test} PRIVATE ${TEST_SRC_DIR})
 
-    add_test("${PROJECT_NAME}_GTests" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_Test}")
+    include(GoogleTest)
+    gtest_discover_tests(${PROJECT_Test})
 endif()
 
 if(BENCHMARK_SOURCE_FILES AND ${GTEST_BENCHMARK_FOUND})
