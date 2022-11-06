@@ -34,15 +34,15 @@ void matrix::generator::C(matrix& MatrixInstance) {
         static std::random_device rd;
         /*
          * Hardware or software random generator for seeding Mersenne Twister.
-         * It is constructor is quit expensive, so we will create it as a static variable
+         * Its constructor is quit expensive, so we will create it as a static variable
          */
         static std::mt19937 mt {rd()};
         /*
-         * Mersenne Twister engine also too expensive to call its constructor every time,
+         * Mersenne Twister engine is also too expensive to call its constructor every time,
          * and it weights about 5KB, it is too big for storing it on the stack,
-         * so we creating it as a static variable as well
+         * so we are creating it as a static variable as well
          */
-        std::uniform_int_distribution<size_t> dist(LowerBound, LowerBound + Length);
+        static std::uniform_int_distribution<size_t> dist(LowerBound, LowerBound + Length);
         return dist(mt);
     };
 
@@ -61,8 +61,7 @@ void matrix::generator::C(matrix& MatrixInstance) {
             }
 
             CurrentCellLowerBound += 1;
-            MatrixInstance[Row][Column] = get_random_int(CurrentCellLowerBound,
-                                                         Epsilon);
+            MatrixInstance[Row][Column] = CurrentCellLowerBound + get_random_int(CurrentCellLowerBound, Epsilon);
         }
     }
 }

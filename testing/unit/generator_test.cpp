@@ -22,8 +22,8 @@ public:
 
     void SetUp() override {
         auto Pair = GetParam();
-        Columns = std::get<0>(Pair);
-        Rows = std::get<1>(Pair);
+        Rows = std::get<0>(Pair);
+        Columns = std::get<1>(Pair);
     };
 
     void TearDown() override {};
@@ -68,13 +68,13 @@ TEST_P(GeneratorUnitTest, WrongMatrix) {
             << " Matrix is: " << Rows << "x" << Columns;
 }
 
-constexpr uint32_t ColumnsSet[] = {9, 10, 11, 49, 50, 51, 99, 100, 101};
-constexpr uint32_t RowsSet[] = {9, 10, 11, 49, 50, 51, 99, 100, 101};
+constexpr uint32_t RowsSet[] = {2, 9, 10, 11, 49, 50, 51, 99, 100, 101, 249, 250, 251};
+constexpr uint32_t ColumnsSet[] = {2, 9, 10, 11, 49, 50, 51, 99, 100, 101, 249, 250, 251};
 
 INSTANTIATE_TEST_SUITE_P(Generator,
                          GeneratorUnitTest,
-                         Combine(ValuesIn(ColumnsSet),
-                                 ValuesIn(RowsSet)),
+                         Combine(ValuesIn(RowsSet),
+                                 ValuesIn(ColumnsSet)),
                          [](const testing::TestParamInfo<GeneratorUnitTest::ParamType>& info) -> std::string {
                              std::string TestCaseName;
                              TestCaseName.reserve(16);
