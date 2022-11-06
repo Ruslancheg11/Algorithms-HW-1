@@ -2,6 +2,7 @@
 #define MATRIX_BASE_HPP
 /* START OF INCLUDING SECTION */
 #include <cstdint>
+#include <cstddef>
 #include <vector>
 /* END OF INCLUDING SECTION */
 
